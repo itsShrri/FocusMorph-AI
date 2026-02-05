@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "iNTUtion 2026: Adaptive UI",
+  "version": "1.0",
+  "description": "AI-driven adaptive interface for cognitive accessibility.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js", "dom.js"],
+      "css": ["morph.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_title": "Adaptive UI"
+  }
+}
