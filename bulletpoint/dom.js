@@ -1,98 +1,184 @@
-// dom.js - Inline Button Edition (CORRECTED)
-let isLockedInFocus = false; 
+// dom.js - Zen Shield, Manual Focus & Sidebar Hiding
+let isLockedInMode = false; 
+
+// 1. Initialize the Manual Button immediately
+initializeFloatingButton();
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === "ADAPT_UI") applyAdaptiveUI(request.level, request.score);
-    if (request.type === "MANUAL_TRIGGER_FOCUS") enterBulletMode();
-    if (request.type === "MANUAL_EXIT_FOCUS") closeBulletMode();
     if (request.type === "SHOW_SUMMARY") renderSummary(request.summary);
 });
 
 function applyAdaptiveUI(level, score) {
-    if (isLockedInFocus) return; 
-    if (level === 'FOCUS') {
+    // F12 Console Log
+    console.log(`🎯 Score: ${score.toFixed(1)} | Level: ${level}`);
+
+    if (isLockedInMode) return; 
+
+    // --- LEVEL 2: DEEP WORK (Auto-Zen) ---
+    if (level === 'DEEP_WORK') {
+        console.log("⚠️ Distraction High! Auto-triggering Zen Shield.");
+        document.body.classList.add('focus-mode-active'); // Hides Sidebars
+        activateZenMode(); 
+    } 
+    // --- LEVEL 1: FOCUS MODE (Hide Sidebars) ---
+    else if (level === 'FOCUS') {
+        console.log("⚠️ Entering Focus Mode: Hiding Sidebars.");
+        
+        // 1. Activate Aura
         document.body.classList.add('focus-aura-pulse');
-        document.documentElement.style.setProperty('--aura-intensity', Math.min(1, score / 100));
-    } else if (level === 'DEEP_WORK') {
-        enterBulletMode(); 
-    } else {
+        document.documentElement.style.setProperty('--aura-intensity', '0.6');
+        
+        // 2. Hide Sidebars (CRITICAL STEP)
+        document.body.classList.add('focus-mode-active');
+        
+        // 3. Mild Grayscale
+        document.body.style.filter = "grayscale(30%)";
+    } 
+    // --- LEVEL 0: NORMAL ---
+    else {
         clearVisualEffects(); 
     }
 }
 
-// 1. INJECT THE BUTTON (This was missing in your file!)
-function enterBulletMode() {
-    if (document.getElementById('intuition-inline-btn')) return;
-
-    const mainContent = findMainContent();
-    const targetHeader = mainContent.querySelector('h1') || mainContent.querySelector('h2') || mainContent;
+// ----------------------------------------------------
+// MODE 1: MANUAL DEEP FOCUS (The Floating Button)
+// ----------------------------------------------------
+function initializeFloatingButton() {
+    if (document.getElementById('intuition-floating-btn')) return;
 
     const btn = document.createElement('button');
-    btn.id = 'intuition-inline-btn';
-    btn.className = 'intuition-start-btn';
-    // Use Unicode to prevent weird text issues
-    btn.innerText = '\u2728 Enter Deep Mode & Summarize'; 
-    btn.onclick = activateDeepMode;
+    btn.id = 'intuition-floating-btn';
+    btn.className = 'intuition-floating-btn';
+    btn.innerText = '\u2728 Deep Focus'; 
+    btn.onclick = () => {
+        console.log("👆 User Clicked Deep Focus");
+        activateDeepFocus();
+    };
 
-    if (targetHeader.nextSibling) {
-        targetHeader.parentNode.insertBefore(btn, targetHeader.nextSibling);
-    } else {
-        targetHeader.appendChild(btn);
-    }
-    
-    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.body.appendChild(btn);
 }
 
-// 2. ACTIVATE REAL FOCUS
-function activateDeepMode() {
-    if (isLockedInFocus) return;
-    isLockedInFocus = true;
+function activateDeepFocus() {
+    if (isLockedInMode) return;
+    isLockedInMode = true;
 
-    document.body.classList.add('deep-work-active');
+    // HIDE SIDEBARS & Activate Aura
+    document.body.classList.add('focus-mode-active');
     document.body.classList.add('focus-aura-pulse');
     document.documentElement.style.setProperty('--aura-intensity', '1');
-
-    createOverlayUI();
     
-    const btn = document.getElementById('intuition-inline-btn');
-    if (btn) btn.remove();
-
+    createSummaryOverlay();
     triggerAI();
 }
 
-function createOverlayUI() {
+// ----------------------------------------------------
+// MODE 2: AUTOMATIC ZEN MODE (The Shield)
+// ----------------------------------------------------
+function activateZenMode() {
+    if (isLockedInMode) return;
+    isLockedInMode = true;
+
+    document.body.classList.add('grayscale-mode');
+    document.body.classList.add('focus-mode-active'); // Hides Sidebars
+    
+    let shield = document.getElementById('zen-shield-overlay');
+    if (!shield) {
+        shield = document.createElement('div');
+        shield.id = 'zen-shield-overlay';
+        shield.innerHTML = `
+            <h1>ZEN MODE ACTIVATED</h1>
+            <p>Cognitive load limit reached.</p>
+            <p style="font-size: 14px; opacity: 0.8; margin-bottom: 30px;">Take a deep breath. The screen will remain dark until you resume.</p>
+            <button id="zen-resume-btn">Resume Browsing</button>
+        `;
+        document.body.appendChild(shield);
+        
+        document.getElementById('zen-resume-btn').onclick = () => {
+            shield.remove();
+            exitModes(); 
+        };
+    }
+}
+
+// ----------------------------------------------------
+// SHARED UTILITIES
+// ----------------------------------------------------
+
+function exitModes() {
+    isLockedInMode = false;
+    
+    // Reset ALL Styles
+    document.body.classList.remove('grayscale-mode');
+    document.body.classList.remove('focus-mode-active'); // SHOW Sidebars
+    document.body.classList.remove('focus-aura-pulse');
+    document.body.style.filter = ""; 
+    
+    const overlay = document.getElementById('bullet-mode-overlay');
+    if (overlay) overlay.remove();
+    
+    const shield = document.getElementById('zen-shield-overlay');
+    if (shield) shield.remove();
+    
+    console.log("🟢 Mode Reset: NORMAL");
+}
+
+function createSummaryOverlay() {
     let overlay = document.createElement('div');
     overlay.id = 'bullet-mode-overlay';
     overlay.innerHTML = `
         <div id="bullet-mode-content">
             <div id="bullet-mode-header">🧠 AI is analyzing...</div>
-            <div id="bullet-loading-spinner" style="font-size:12px; color:#999; margin-bottom:10px;">Reading content & generating notes...</div>
-            <div id="bullet-list" style="transition: opacity 0.3s ease; line-height: 1.6; text-align: left;"></div>
-            <button id="exit-focus-btn" style="margin-top: 30px; background: #eee; border:none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Exit Focus Mode</button>
+            <div id="bullet-loading-spinner" style="font-size:12px; color:#999; margin-bottom:10px;">Generating study notes...</div>
+            <div id="bullet-list" style="text-align: left;"></div>
+            <button id="exit-focus-btn" style="margin-top: 20px; padding: 10px 20px;">Exit Focus Mode</button>
         </div>
     `;
     document.body.appendChild(overlay);
-    document.getElementById('exit-focus-btn').onclick = closeBulletMode;
+    document.getElementById('exit-focus-btn').onclick = exitModes;
 }
 
 function triggerAI() {
+    // 1. Find the "meat" of the page (Article body)
     const mainContent = findMainContent() || document.body;
+    
+    // 2. Clone it so we don't mess up the actual page
     const clone = mainContent.cloneNode(true);
-    clone.querySelectorAll('script, style, svg, nav, footer, iframe').forEach(n => n.remove());
+    
+    // 3. Remove junk (Scripts, ads, navs, hidden stuff)
+    const junkSelectors = [
+        'script', 'style', 'svg', 'iframe', 'nav', 'footer', 
+        '.ads', '.ad', '.advertisement', '[role="complementary"]'
+    ];
+    clone.querySelectorAll(junkSelectors.join(',')).forEach(n => n.remove());
 
-    const meaningfulElements = clone.querySelectorAll('h1, h2, h3, p, li');
-    let cleanTextPayload = "";
+    // 4. INTELLIGENT EXTRACTION (The Fix)
+    // Instead of clone.innerText (which kills links), we loop through text blocks 
+    // and grab their .outerHTML (which keeps links alive).
+    let richTextPayload = "";
+    const meaningfulElements = clone.querySelectorAll('p, h1, h2, h3, li, blockquote');
     
     meaningfulElements.forEach(el => {
         const text = el.innerText.trim();
-        if (text.length > 50) cleanTextPayload += el.innerHTML + "\n\n";
+        // Only include if it has actual content (skip empty spacer divs)
+        if (text.length > 30) {
+            richTextPayload += el.outerHTML + "\n";
+        }
     });
 
-    if (cleanTextPayload.length < 100) cleanTextPayload = document.body.innerText.substring(0, 5000);
+    // Fallback: If intelligent extraction failed (e.g. site uses weird divs), grab raw HTML
+    if (richTextPayload.length < 500) {
+        richTextPayload = clone.innerHTML; 
+    }
 
+    // 5. Truncate to safety limit (Gemini Flash has a large context, but let's be safe with ~15k chars)
+    const finalPayload = richTextPayload.substring(0, 15000);
+
+    // 6. Send to Background
+    console.log("📤 Sending payload length:", finalPayload.length);
     chrome.runtime.sendMessage({
         type: "SUMMARIZE_TEXT",
-        text: cleanTextPayload.substring(0, 12000) 
+        text: finalPayload
     });
 }
 
@@ -104,24 +190,16 @@ function renderSummary(summaryText) {
     if (header && container) {
         header.innerText = "✨ Smart Notes"; 
         if (spinner) spinner.style.display = "none";
-        container.style.opacity = 0;
-        setTimeout(() => {
-            container.innerHTML = summaryText;
-            container.style.opacity = 1;
-        }, 200);
+        container.innerHTML = summaryText;
     }
 }
 
-function closeBulletMode() {
-    isLockedInFocus = false;
-    document.body.classList.remove('deep-work-active');
-    document.body.classList.remove('focus-aura-pulse');
-    const overlay = document.getElementById('bullet-mode-overlay');
-    if (overlay) overlay.remove();
-}
-
 function clearVisualEffects() {
-    document.body.classList.remove('focus-aura-pulse');
+    if (!isLockedInMode) {
+        document.body.classList.remove('focus-aura-pulse');
+        document.body.classList.remove('focus-mode-active'); // SHOW Sidebars
+        document.body.style.filter = "";
+    }
 }
 
 function findMainContent() {

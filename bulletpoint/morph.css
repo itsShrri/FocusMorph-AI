@@ -1,103 +1,94 @@
-/* morph.css */
+/* morph.css - Zen & Sidebar Killer Edition */
 
-/* ... keep your existing Focus Aura styles ... */
+/* 1. The Aura (Visual Warning) */
+.focus-aura-pulse { position: relative; }
+.focus-aura-pulse::after {
+    content: ''; position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border: 8px solid rgba(100, 200, 255, 0.6);
+    box-shadow: 0 0 30px rgba(100, 200, 255, 0.8) inset;
+    pointer-events: none; z-index: 9998;
+    animation: pulse 3s infinite;
+    opacity: var(--aura-intensity, 0);
+    transition: opacity 1s;
+}
+@keyframes pulse {
+    0% { border-color: rgba(100, 200, 255, 0.4); }
+    50% { border-color: rgba(100, 200, 255, 0.9); }
+    100% { border-color: rgba(100, 200, 255, 0.4); }
+}
 
-/* The Bullet Mode Overlay (Covers EVERYTHING) */
+/* 2. Zen Mode (Blackout) */
+.grayscale-mode { filter: grayscale(100%) !important; transition: filter 1s ease; }
+
+#zen-shield-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.96); /* Pitch Black */
+    z-index: 2147483647;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    color: white; font-family: 'Segoe UI', sans-serif;
+    backdrop-filter: blur(5px);
+}
+
+#zen-shield-overlay h1 { font-size: 3rem; margin-bottom: 1rem; color: #fff; }
+#zen-shield-overlay button {
+    padding: 12px 30px; font-size: 1.1rem;
+    background: transparent; border: 2px solid white; color: white;
+    cursor: pointer; border-radius: 50px; transition: 0.3s;
+}
+#zen-shield-overlay button:hover { background: white; color: black; }
+
+/* 3. Deep Focus (White Summary Overlay) */
 #bullet-mode-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: #fcfcfc; /* Soothing off-white */
-    z-index: 2147483647; /* Topmost layer */
-    padding: 40px;
-    box-sizing: border-box;
-    overflow-y: auto; /* Allow scrolling inside the overlay */
-    font-family: 'Verdana', sans-serif; /* Easy to read font */
-    color: #333;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    display: none; /* Hidden by default */
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: #fcfcfc;
+    z-index: 2147483646; /* Just below Zen Shield */
+    padding: 40px; box-sizing: border-box; overflow-y: auto;
+    display: flex; justify-content: center;
 }
-
-/* When active, show it */
-body.deep-work-active #bullet-mode-overlay {
-    display: block;
-    opacity: 1;
-}
-
-/* The List Container */
 #bullet-mode-content {
-    max-width: 800px;
-    margin: 0 auto;
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
+    max-width: 800px; width: 100%; background: white;
+    padding: 40px; border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
+#bullet-mode-header { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #333; }
 
-/* The Bullets */
-#bullet-mode-content ul {
-    list-style-type: none; /* Remove default dots */
-    padding: 0;
-}
-
-#bullet-mode-content li {
-    margin-bottom: 20px;
-    padding-left: 20px;
-    position: relative;
-    line-height: 1.6;
-    font-size: 18px;
-    border-left: 4px solid #007bff; /* Blue accent bar */
-}
-
-#bullet-mode-header {
-    text-align: center;
-    color: #555;
-    margin-bottom: 30px;
-    font-size: 24px;
-    font-weight: bold;
-}
-
-#bullet-loading-spinner {
-    text-align: center;
-    padding: 40px;
-    font-style: italic;
-    color: #666;
-    animation: fadePulse 1.5s infinite;
-}
-
-@keyframes fadePulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
-}
-
-/* The "Inline" Start Button */
-.intuition-start-btn {
-    display: inline-block;
-    margin: 20px 0;
-    padding: 12px 24px;
+/* 4. The Floating Button */
+.intuition-floating-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 15px 25px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
-    font-weight: bold;
-    font-size: 16px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
-    z-index: 1000;
-    position: relative; /* Ensure it sits nicely in the flow */
+    color: white; font-weight: bold; font-size: 16px;
+    border: none; border-radius: 50px; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 2147483645;
+}
+.intuition-floating-btn:hover { transform: translateY(-3px); }
+
+/* --- 5. SIDEBAR KILLER (This logic was missing!) --- */
+body.focus-mode-active aside,
+body.focus-mode-active nav,
+body.focus-mode-active .sidebar,
+body.focus-mode-active #sidebar,
+body.focus-mode-active #secondary,
+body.focus-mode-active #right-rail,
+body.focus-mode-active .mw-panel,   /* Wikipedia Sidebar */
+body.focus-mode-active .vector-menu, /* Wikipedia Menu */
+body.focus-mode-active .ads,
+body.focus-mode-active [role="complementary"] {
+    display: none !important;
+    opacity: 0;
+    transition: opacity 0.5s ease;
 }
 
-.intuition-start-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-}
-
-.intuition-start-btn:active {
-    transform: translateY(1px);
+/* Center Content when Sidebar is gone */
+body.focus-mode-active main,
+body.focus-mode-active article,
+body.focus-mode-active #content,
+body.focus-mode-active .mw-body {
+    margin: 0 auto !important;
+    max-width: 900px !important;
+    float: none !important;
+    width: 90% !important;
 }
