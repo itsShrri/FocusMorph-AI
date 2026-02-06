@@ -33,6 +33,12 @@ function processTelemetry(metrics, tabId) {
         .then(response => response.json())
         .then(data => {
             console.log("Prediction received:", data);
+
+            // Update distractionScore based on focus score (inverted)
+            if (typeof data.score === 'number') {
+                distractionScore = 100 - data.score;
+                console.log(`Updated distractionScore: ${distractionScore} (Focus: ${data.score})`);
+            }
             if (data.level) {
                 chrome.tabs.sendMessage(tabId, {
                     type: "ADAPT_UI",
