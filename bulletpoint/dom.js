@@ -1,7 +1,6 @@
-// dom.js - Zen Shield, Manual Focus & Sidebar Hiding
+// dom.js - Merged Focus State (Spotlight + Sidebar Killer)
 let isLockedInMode = false; 
 
-// 1. Initialize the Manual Button immediately
 initializeFloatingButton();
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -10,30 +9,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function applyAdaptiveUI(level, score) {
-    // F12 Console Log
     console.log(`🎯 Score: ${score.toFixed(1)} | Level: ${level}`);
 
     if (isLockedInMode) return; 
 
-    // --- LEVEL 2: DEEP WORK (Auto-Zen) ---
-    if (level === 'DEEP_WORK') {
-        console.log("⚠️ Distraction High! Auto-triggering Zen Shield.");
-        document.body.classList.add('focus-mode-active'); // Hides Sidebars
+    // --- LEVEL 2: ZEN MODE (Auto-Trigger at Score 80+) ---
+    if (level === 'ZEN') {
+        console.log("⚠️ Distraction Critical! Auto-triggering Zen Shield.");
+        document.body.classList.add('focus-mode-active'); 
         activateZenMode(); 
     } 
-    // --- LEVEL 1: FOCUS MODE (Hide Sidebars) ---
+    // --- LEVEL 1: FOCUS MODE (Merged Features) ---
     else if (level === 'FOCUS') {
-        console.log("⚠️ Entering Focus Mode: Hiding Sidebars.");
-        
-        // 1. Activate Aura
-        document.body.classList.add('focus-aura-pulse');
-        document.documentElement.style.setProperty('--aura-intensity', '0.6');
-        
-        // 2. Hide Sidebars (CRITICAL STEP)
+        // 1. Sidebar Killer
         document.body.classList.add('focus-mode-active');
         
-        // 3. Mild Grayscale
-        document.body.style.filter = "grayscale(30%)";
+        // 2. Reading Spotlight (Dim Text) - Formerly Deep Work feature
+        document.body.classList.add('deep-work-active'); 
+
+        // 3. Strong Aura
+        document.body.classList.add('focus-aura-pulse');
+        document.documentElement.style.setProperty('--aura-intensity', '0.8');
+
+        // 4. Safe Grayscale Overlay
+        setFilterLayer(true, 'grayscale(60%)');
     } 
     // --- LEVEL 0: NORMAL ---
     else {
@@ -41,12 +40,8 @@ function applyAdaptiveUI(level, score) {
     }
 }
 
-// ----------------------------------------------------
-// MODE 1: MANUAL DEEP FOCUS (The Floating Button)
-// ----------------------------------------------------
 function initializeFloatingButton() {
     if (document.getElementById('intuition-floating-btn')) return;
-
     const btn = document.createElement('button');
     btn.id = 'intuition-floating-btn';
     btn.className = 'intuition-floating-btn';
@@ -55,7 +50,6 @@ function initializeFloatingButton() {
         console.log("👆 User Clicked Deep Focus");
         activateDeepFocus();
     };
-
     document.body.appendChild(btn);
 }
 
@@ -63,25 +57,30 @@ function activateDeepFocus() {
     if (isLockedInMode) return;
     isLockedInMode = true;
 
-    // HIDE SIDEBARS & Activate Aura
-    document.body.classList.add('focus-mode-active');
-    document.body.classList.add('focus-aura-pulse');
+    // Apply ALL Focus Effects
+    document.body.classList.add('focus-mode-active'); 
+    document.body.classList.add('deep-work-active');  
+    document.body.classList.add('focus-aura-pulse');  
     document.documentElement.style.setProperty('--aura-intensity', '1');
     
+    // Lock Scroll & HTML
+    document.body.classList.add('no-scroll');
+    document.documentElement.classList.add('no-scroll'); 
+
     createSummaryOverlay();
     triggerAI();
 }
 
-// ----------------------------------------------------
-// MODE 2: AUTOMATIC ZEN MODE (The Shield)
-// ----------------------------------------------------
 function activateZenMode() {
     if (isLockedInMode) return;
     isLockedInMode = true;
 
-    document.body.classList.add('grayscale-mode');
-    document.body.classList.add('focus-mode-active'); // Hides Sidebars
+    document.body.classList.add('focus-mode-active'); 
     
+    // Lock Scroll
+    document.body.classList.add('no-scroll');
+    document.documentElement.classList.add('no-scroll');
+
     let shield = document.getElementById('zen-shield-overlay');
     if (!shield) {
         shield = document.createElement('div');
@@ -101,18 +100,33 @@ function activateZenMode() {
     }
 }
 
-// ----------------------------------------------------
-// SHARED UTILITIES
-// ----------------------------------------------------
+// Helper for Safe Grayscale
+function setFilterLayer(active, filterValue) {
+    let layer = document.getElementById('focus-filter-layer');
+    if (active) {
+        if (!layer) {
+            layer = document.createElement('div');
+            layer.id = 'focus-filter-layer';
+            document.body.appendChild(layer);
+        }
+        layer.style.backdropFilter = filterValue;
+    } else {
+        if (layer) layer.remove();
+    }
+}
 
 function exitModes() {
     isLockedInMode = false;
     
-    // Reset ALL Styles
-    document.body.classList.remove('grayscale-mode');
-    document.body.classList.remove('focus-mode-active'); // SHOW Sidebars
+    // Remove ALL Styles
+    document.body.classList.remove('focus-mode-active'); 
+    document.body.classList.remove('deep-work-active'); 
     document.body.classList.remove('focus-aura-pulse');
-    document.body.style.filter = ""; 
+    
+    document.body.classList.remove('no-scroll');
+    document.documentElement.classList.remove('no-scroll');
+
+    setFilterLayer(false);
     
     const overlay = document.getElementById('bullet-mode-overlay');
     if (overlay) overlay.remove();
@@ -121,6 +135,17 @@ function exitModes() {
     if (shield) shield.remove();
     
     console.log("🟢 Mode Reset: NORMAL");
+}
+
+function clearVisualEffects() {
+    if (!isLockedInMode) {
+        document.body.classList.remove('focus-aura-pulse');
+        document.body.classList.remove('focus-mode-active');
+        document.body.classList.remove('deep-work-active'); 
+        document.body.classList.remove('no-scroll');
+        document.documentElement.classList.remove('no-scroll');
+        setFilterLayer(false);
+    }
 }
 
 function createSummaryOverlay() {
@@ -139,47 +164,23 @@ function createSummaryOverlay() {
 }
 
 function triggerAI() {
-    // 1. Find the "meat" of the page (Article body)
     const mainContent = findMainContent() || document.body;
-    
-    // 2. Clone it so we don't mess up the actual page
     const clone = mainContent.cloneNode(true);
     
-    // 3. Remove junk (Scripts, ads, navs, hidden stuff)
-    const junkSelectors = [
-        'script', 'style', 'svg', 'iframe', 'nav', 'footer', 
-        '.ads', '.ad', '.advertisement', '[role="complementary"]'
-    ];
+    const junkSelectors = ['script', 'style', 'svg', 'iframe', 'nav', 'footer', '.ads', '.ad', '.advertisement', '[role="complementary"]'];
     clone.querySelectorAll(junkSelectors.join(',')).forEach(n => n.remove());
 
-    // 4. INTELLIGENT EXTRACTION (The Fix)
-    // Instead of clone.innerText (which kills links), we loop through text blocks 
-    // and grab their .outerHTML (which keeps links alive).
     let richTextPayload = "";
     const meaningfulElements = clone.querySelectorAll('p, h1, h2, h3, li, blockquote');
     
     meaningfulElements.forEach(el => {
         const text = el.innerText.trim();
-        // Only include if it has actual content (skip empty spacer divs)
-        if (text.length > 30) {
-            richTextPayload += el.outerHTML + "\n";
-        }
+        if (text.length > 30) richTextPayload += el.outerHTML + "\n";
     });
 
-    // Fallback: If intelligent extraction failed (e.g. site uses weird divs), grab raw HTML
-    if (richTextPayload.length < 500) {
-        richTextPayload = clone.innerHTML; 
-    }
-
-    // 5. Truncate to safety limit (Gemini Flash has a large context, but let's be safe with ~15k chars)
+    if (richTextPayload.length < 500) richTextPayload = clone.innerHTML; 
     const finalPayload = richTextPayload.substring(0, 15000);
-
-    // 6. Send to Background
-    console.log("📤 Sending payload length:", finalPayload.length);
-    chrome.runtime.sendMessage({
-        type: "SUMMARIZE_TEXT",
-        text: finalPayload
-    });
+    chrome.runtime.sendMessage({ type: "SUMMARIZE_TEXT", text: finalPayload });
 }
 
 function renderSummary(summaryText) {
@@ -190,15 +191,7 @@ function renderSummary(summaryText) {
     if (header && container) {
         header.innerText = "✨ Smart Notes"; 
         if (spinner) spinner.style.display = "none";
-        container.innerHTML = summaryText;
-    }
-}
-
-function clearVisualEffects() {
-    if (!isLockedInMode) {
-        document.body.classList.remove('focus-aura-pulse');
-        document.body.classList.remove('focus-mode-active'); // SHOW Sidebars
-        document.body.style.filter = "";
+        container.innerHTML = formatFirstWords(summaryText);
     }
 }
 
@@ -209,4 +202,15 @@ function findMainContent() {
         if (el && el.innerText.length > 500) return el;
     }
     return document.body;
+}
+
+function formatFirstWords(htmlContent) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    const elements = tempDiv.querySelectorAll('p, li');
+    elements.forEach(el => {
+        const text = el.innerHTML;
+        el.innerHTML = text.replace(/^\s*([a-zA-Z0-9'’]+)/, '<strong style="color:#2c3e50; font-weight:800;">$1</strong>');
+    });
+    return tempDiv.innerHTML;
 }
