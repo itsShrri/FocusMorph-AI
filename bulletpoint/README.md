@@ -11,7 +11,7 @@ Standard digital interfaces are often rigid and filled with visual noise. For ne
 - **AI Summarisation:** A dedicated summarisation mode that uses Gemini 2.5 Flash to extract meaningful content and generate structured HTML summary, removing the need to read through cluttered pages.
 - **Zen Mode:** A high-threshold "Blackout" shield that triggers during extreme distraction to force a mental reset.
 
-🛠️ **Technical Implementation**
+## 🛠️ Technical Implementation
 - **Frontend Logic:** Pure JavaScript (Manifest V3) for low-latency DOM manipulation and telemetry gathering.
 - **Machine Learning:** Scikit-learn to determine distraction score for ADHD users.
 - **AI Integration:** Leverages the Google Gemini API for context-aware text summarization.
