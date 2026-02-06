@@ -17,17 +17,11 @@ Standard digital interfaces are often rigid and filled with visual noise. For ne
 - **Styling**: CSS-driven "Aura" pulses and layout shifts to ensure the user's flow isn't broken by hard page reloads.
 
 🚀 **Getting Started**
-1. Clone the Repository:
-   Bash: git clone https://github.com/your-username/focusmorph-ai.git
-
-2. Load the Extension:
-   Open Chrome and navigate to chrome://extensions/.
-   Enable Developer Mode.
-   Click Load unpacked and select the project folder.
-
-3. Configure AI:
-   Open the extension Options.
-   Paste your Gemini API Key.
-
-4. Experience Focus:
-   Browse naturally; the UI will dim and simplify as your interaction patterns indicate a loss of focus.
+1. Clone the Repository
+2. Run Bash: git clone https://github.com/your-username/focusmorph-ai.git
+3. Open Chrome and navigate to chrome://extensions/.
+4. Enable Developer Mode.
+5. Click Load unpacked and select the project folder.
+6. Open the extension Options.
+7. Paste your Gemini API Key.
+8. Browse naturally; the UI will dim and simplify as your interaction patterns indicate a loss of focus.
