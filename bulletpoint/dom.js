@@ -45,9 +45,9 @@ function initializeFloatingButton() {
     const btn = document.createElement('button');
     btn.id = 'intuition-floating-btn';
     btn.className = 'intuition-floating-btn';
-    btn.innerText = '\u2728 Deep Focus'; 
+    btn.innerText = '\u2728 AI summary'; 
     btn.onclick = () => {
-        console.log("👆 User Clicked Deep Focus");
+        console.log("👆 User Clicked AI Summary");
         activateDeepFocus();
     };
     document.body.appendChild(btn);
