@@ -1,4 +1,4 @@
-// Telemetry Engine
+// Telemetry Engine (Upgraded for Jitter Detection)
 
 let mouseVelocity = 0;
 let lastMouseX = 0;
@@ -10,17 +10,21 @@ let lastScrollY = window.scrollY;
 let lastScrollTime = Date.now();
 let lastScrollVelocity = 0;
 
+// NEW: Variables for Scroll Jitter
+let scrollDirectionChanges = 0;
+let lastScrollDirection = 0; // 1 for down, -1 for up
+
 let tabSwitchCount = 0;
 
 // Mouse Velocity Tracker
 document.addEventListener('mousemove', (e) => {
     const now = Date.now();
     const dt = now - lastMouseTime;
-    if (dt > 50) { // Limit sampling
+    if (dt > 50) {
         const dx = e.clientX - lastMouseX;
         const dy = e.clientY - lastMouseY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        mouseVelocity = distance / dt; // pixels per ms
+        mouseVelocity = distance / dt;
 
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
@@ -28,16 +32,27 @@ document.addEventListener('mousemove', (e) => {
     }
 });
 
-// Scroll Acceleration Tracker
+// Scroll Tracker (Now detects Direction Swaps)
 window.addEventListener('scroll', () => {
     const now = Date.now();
     const dt = now - lastScrollTime;
-    if (dt > 50) {
-        const dy = Math.abs(window.scrollY - lastScrollY);
-        const velocity = dy / dt;
+    
+    if (dt > 20) { // Check slightly faster for jitter
+        const currentScrollY = window.scrollY;
+        const dy = currentScrollY - lastScrollY; // Signed difference (positive or negative)
+        
+        // 1. Calculate Acceleration (existing logic)
+        const velocity = Math.abs(dy) / dt;
         scrollAcceleration = Math.abs(velocity - lastScrollVelocity) / dt;
 
-        lastScrollY = window.scrollY;
+        // 2. Calculate Direction Changes (NEW LOGIC)
+        const currentDirection = Math.sign(dy); // returns 1 or -1
+        if (currentDirection !== 0 && currentDirection !== lastScrollDirection) {
+            scrollDirectionChanges++;
+            lastScrollDirection = currentDirection;
+        }
+
+        lastScrollY = currentScrollY;
         lastScrollVelocity = velocity;
         lastScrollTime = now;
     }
@@ -58,27 +73,32 @@ setInterval(() => {
             metrics: {
                 mouseVelocity: parseFloat(mouseVelocity.toFixed(4)),
                 scrollAcceleration: parseFloat(scrollAcceleration.toFixed(6)),
+                // Send the new metric
+                scrollDirectionChanges: scrollDirectionChanges,
                 tabSwitchCount: tabSwitchCount,
                 timestamp: Date.now()
             }
         };
 
-        // Reset counters (optional, depending on if we want cumulative or instantaneous)
-        // tabSwitchCount = 0; // Keeping it cumulative for now, or reset?
-        // Let's reset tab switch count to send "switches per interval"
+        // Reset counters
         const currentTabSwitches = tabSwitchCount;
         tabSwitchCount = 0;
         telemetryData.metrics.tabSwitchCount = currentTabSwitches;
 
+        // Reset Jitter counter
+        const currentJitter = scrollDirectionChanges;
+        scrollDirectionChanges = 0; 
+        telemetryData.metrics.scrollDirectionChanges = currentJitter;
+
         chrome.runtime.sendMessage(telemetryData);
 
-        // Decay values (simulating momentary bursts)
+        // Decay instantaneous values
         mouseVelocity *= 0.5;
         scrollAcceleration *= 0.1;
     } catch (error) {
-        // Context invalidated, etc.
+        // Context invalidated
     }
-}, 500);
+}, 500); // Sends data every 0.5 seconds
 
 // Listen for adaptive commands
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -88,4 +108,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
     }
 });
-
