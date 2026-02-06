@@ -83,8 +83,8 @@ async function summarizeWithGemini(rawText, tabId) {
 
         if (data.error) {
             console.error("❌ API ERROR:", data.error.message);
-            chrome.tabs.sendMessage(tabId, { 
-                type: "SHOW_SUMMARY", 
+            chrome.tabs.sendMessage(tabId, {
+                type: "SHOW_SUMMARY",
                 summary: `❌ API Error: ${data.error.message}`
             });
             return;
@@ -94,16 +94,16 @@ async function summarizeWithGemini(rawText, tabId) {
             const summary = data.candidates[0].content.parts[0].text;
             chrome.tabs.sendMessage(tabId, { type: "SHOW_SUMMARY", summary: summary });
         } else {
-            chrome.tabs.sendMessage(tabId, { 
-                type: "SHOW_SUMMARY", 
+            chrome.tabs.sendMessage(tabId, {
+                type: "SHOW_SUMMARY",
                 summary: "⚠️ AI returned no text."
             });
         }
 
     } catch (error) {
         console.error("Network Error:", error);
-        chrome.tabs.sendMessage(tabId, { 
-            type: "SHOW_SUMMARY", 
+        chrome.tabs.sendMessage(tabId, {
+            type: "SHOW_SUMMARY",
             summary: "❌ Network Error. Check internet connection."
         });
     }
