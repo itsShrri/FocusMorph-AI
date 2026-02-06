@@ -1,6 +1,6 @@
 // background.js - 3-State Edition (Normal -> Focus -> Zen)
 
-const DEFAULT_KEY = "AIzaSyCSGxDVjPKxH5OsbMozAKodh9CSDc4GLDs"; 
+const DEFAULT_KEY = "PASTE_YOUR_DEFAULT_API_KEY_HERE"; 
 
 // --- Telemetry & Scoring Logic ---
 let distractionScore = 0;
