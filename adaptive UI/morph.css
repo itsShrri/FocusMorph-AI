@@ -1,0 +1,56 @@
+/* Morphic Styles */
+
+:root {
+    --aura-intensity: 0.5;
+    --aura-color: 0, 120, 255;
+    /* Blue-ish */
+}
+
+/* Focus Aura - Pulsing Border/Shadow */
+.focus-aura-pulse {
+    /* Using box-shadow on body might be hidden by page layout, 
+       so we use a pseudo-element overlay on the viewport edges */
+    position: relative;
+}
+
+.focus-aura-pulse::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 2147483647;
+    /* Max Z-Index */
+    box-shadow: inset 0 0 calc(50px * var(--aura-intensity)) rgba(var(--aura-color), var(--aura-intensity));
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.5;
+    }
+}
+
+/* Spotlight - Blur Background */
+.spotlight-blur {
+    filter: blur(4px) !important;
+    opacity: 0.6;
+    transition: filter 0.5s ease, opacity 0.5s ease;
+    pointer-events: none;
+    /* Prevent clicks on blurred items */
+}
+
+/* Visual Pruning - Hard Hide */
+.visually-pruned {
+    display: none !important;
+}
