@@ -1,44 +1,33 @@
-FocusMorph AI: Adaptive UI for Neurodiversity
+# FocusMorph AI: Adaptive UI for Neurodiversity
+---
 FocusMorph AI is an intelligent browser extension designed to combat "distraction spirals" for users with ADHD and cognitive impairments by dynamically morphing the web environment based on real-time behavior. This project was developed as part of iNTUtion 2026 at Nanyang Technological University.
 
-🧠 The Problem
+🧠 **The Problem**
 Standard digital interfaces are often rigid and filled with visual noise. For neurodivergent users, this leads to high cognitive load, making it difficult to maintain focus on primary tasks.
 
-✨ Key Features
-Behavioral Telemetry: Real-time tracking of mouse velocity, scroll jitter, and tab-switching frequency to detect cognitive fatigue.
+✨ **Key Features**
+- Behavioral Telemetry: Real-time tracking of mouse velocity, scroll jitter, and tab-switching frequency to detect cognitive fatigue.
+- Adaptive UI Morphing: The interface automatically "prunes" visual noise by hiding sidebars, navigation menus, and ads when distraction is detected.
+- AI Study Shield: A dedicated "Deep Focus" mode that uses Gemini 1.5 Flash to extract meaningful content and generate structured HTML study guides, removing the need to read through cluttered pages.
+- Zen Mode: A high-threshold "Blackout" shield that triggers during extreme distraction to force a mental reset through grayscale filters and breathing prompts.
 
-Adaptive UI Morphing: The interface automatically "prunes" visual noise by hiding sidebars, navigation menus, and ads when distraction is detected.
+🛠️ **Technical Implementation**
+- **Frontend Logic**: Pure JavaScript (Manifest V3) for low-latency DOM manipulation and telemetry gathering.
+- **AI Integration**: Leverages the Google Gemini API for context-aware text summarization.
+- **Styling**: CSS-driven "Aura" pulses and layout shifts to ensure the user's flow isn't broken by hard page reloads.
 
-AI Study Shield: A dedicated "Deep Focus" mode that uses Gemini 1.5 Flash to extract meaningful content and generate structured HTML study guides, removing the need to read through cluttered pages.
+🚀 **Getting Started**
+1. Clone the Repository:
+   Bash: git clone https://github.com/your-username/focusmorph-ai.git
 
-Zen Mode: A high-threshold "Blackout" shield that triggers during extreme distraction to force a mental reset through grayscale filters and breathing prompts.
+2. Load the Extension:
+   Open Chrome and navigate to chrome://extensions/.
+   Enable Developer Mode.
+   Click Load unpacked and select the project folder.
 
-🛠️ Technical Implementation
-Frontend Logic: Pure JavaScript (Manifest V3) for low-latency DOM manipulation and telemetry gathering.
+3. Configure AI:
+   Open the extension Options.
+   Paste your Gemini API Key.
 
-AI Integration: Leverages the Google Gemini API for context-aware text summarization.
-
-Styling: CSS-driven "Aura" pulses and layout shifts to ensure the user's flow isn't broken by hard page reloads.
-
-🚀 Getting Started
-Clone the Repository:
-
-Bash
-git clone https://github.com/your-username/focusmorph-ai.git
-Load the Extension:
-
-Open Chrome and navigate to chrome://extensions/.
-
-Enable Developer Mode.
-
-Click Load unpacked and select the project folder.
-
-Configure AI:
-
-Open the extension Options.
-
-Paste your Gemini API Key.
-
-Experience Focus:
-
-Browse naturally; the UI will dim and simplify as your interaction patterns indicate a loss of focus.
+4. Experience Focus:
+   Browse naturally; the UI will dim and simplify as your interaction patterns indicate a loss of focus.
